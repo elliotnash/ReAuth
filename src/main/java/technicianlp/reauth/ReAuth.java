@@ -39,11 +39,15 @@ public final class ReAuth {
         if (FMLEnvironment.dist == Dist.CLIENT) {
             ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, config.getSpec(), "../reauth.toml");
             modInfo = ModLoadingContext.get().getActiveContainer().getModInfo();
+
+
+
+
         } else {
-            log.warn("#########################################");
-            log.warn("#      ReAuth was loaded on Server      #");
-            log.warn("# Consider removing it to save some RAM #");
-            log.warn("#########################################");
+            log.warn("###########################################");
+            log.warn("#       ReAuth was loaded on Server       #");
+            log.warn("# Consider removing it to save some SHEEP #");
+            log.warn("###########################################");
         }
     }
 
@@ -51,6 +55,14 @@ public final class ReAuth {
     public static void setup(FMLCommonSetupEvent event) {
         ModLoadingContext.get().registerExtensionPoint(ExtensionPoint.DISPLAYTEST, () -> Pair.of(() -> FMLNetworkConstants.IGNORESERVERONLY, (a, b) -> true));
 //        ModLoadingContext.get().registerExtensionPoint(ExtensionPoint.CONFIGGUIFACTORY, () -> (mc, sc) -> );
+
+        if (config.storeUsername()){
+            String username = config.getUsername();
+            if (!username.isEmpty()) {
+                auth.offline(username);
+            }
+        }
+
     }
 
     @SubscribeEvent

@@ -14,6 +14,7 @@ public final class Configuration {
     private final ForgeConfigSpec spec;
 
     private final ForgeConfigSpec.IntValue versionSpec;
+    private final ForgeConfigSpec.BooleanValue storeUsername;
     private final ForgeConfigSpec.ConfigValue<String> profileNameSpec;
     private final ForgeConfigSpec.ConfigValue<String> saltSpec;
     private final ForgeConfigSpec.ConfigValue<String> usernameSpec;
@@ -27,6 +28,10 @@ public final class Configuration {
         versionSpec = builder
                 .comment("Version Number of the Configuration File")
                 .defineInRange("version", 2, 1, 2);
+
+        storeUsername = builder
+                .comment("Set this to true to load your username everytime you log on")
+                .define("storeUser", false);
 
         builder.comment("Credentials for login, encrypted with AES-CBC-PKCS5Padding and PBKDF2WithHmacSHA512 " +
                 "based on the Path of this file and the contained Salt.\n" +
@@ -148,8 +153,12 @@ public final class Configuration {
      */
     public String getUsername() {
         String username = usernameSpec.get();
-        if (username.isEmpty())
-            return profileNameSpec.get();
+        if (username.isEmpty()) {
+            ReAuth.log.info("Offline username");
+            String username2 = profileNameSpec.get();
+            ReAuth.log.info(username2);
+            return username2;
+        }
         if (crypto != null)
             return crypto.decryptString(username);
         return "";
@@ -158,6 +167,11 @@ public final class Configuration {
     public String getProfile() {
         return profileNameSpec.get();
     }
+
+    public Boolean storeUsername(){
+        return storeUsername.get();
+    }
+
 
     /**
      * Decrypt Password
